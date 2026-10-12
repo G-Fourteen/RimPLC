@@ -1,5 +1,7 @@
 # RimPLC
 
+![RimPLC — colony logic and control](https://raw.githubusercontent.com/G-Fourteen/RimPLC/main/About/Preview.png)
+
 **RimPLC is a separate mod for colony rules.** It reads the colony, evaluates your conditions and
 shows the matching advice in an in-game ladder window. Rimrooms does not require it, and RimPLC
 does not require Rimrooms, another mod or an expansion. It uses no Harmony.

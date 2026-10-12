@@ -1,5 +1,7 @@
 # RimPLC
 
+![RimPLC — colony logic and control](About/Preview.png)
+
 A standalone ladder-logic advisor for RimWorld. Sensors read the colony, tags set
 thresholds, marks hold recorded values, and rungs describe **if this, then this**.
 The main tab shows each rung's live contacts and lets you edit, enable, import and
@@ -60,6 +62,10 @@ project; neither is bundled here. The companion exposes `rimplc/read_ladder`,
 
 Original RimPLC source is MIT licensed; see [LICENSE](LICENSE). RimWorld and its
 assemblies belong to Ludeon Studios and are not included.
+
+The original [mod preview](About/Preview.png) and transparent
+[branding badge](About/RimPLC_Badge.png) use a cream/brass ladder-circuit motif.
+They are promotional artwork; the game's RimPLC controls remain text-based.
 
 - [Forgejo](https://git.unityailab.com/GFourteen/RimPLC)
 - [GitHub](https://github.com/G-Fourteen/RimPLC)
