@@ -9,7 +9,7 @@ export a ladder. Advice is the default; this version's automatic coils are limit
 to messages, marks and tags. It does not build, spawn or destroy world objects.
 
 **Version 0.1.0.** Package ID `Operator.RimPLC`; author `Operator`.
-RimWorld **1.6 and 1.7** are declared targets and share the existing `1.6/` content
+RimWorld **1.6 and 1.7** are declared targets and share the current `1.7/` content
 folder. A declaration is not a compatibility result: a running 1.7 session has
 not yet been verified. The core requires no other mod, Harmony or expansion.
 Rimrooms-specific preset rungs remain inactive without Rimrooms.
@@ -21,7 +21,7 @@ marks, ladders and commands are included under [docs/schema](docs/schema/).
 
 Copy this repository's mod files to a local Mods folder as `RimPLC`, keeping
 `About/` and `LoadFolders.xml` directly inside it. The loadable files are
-`About/`, `LoadFolders.xml`, `1.6/`, `Languages/` and `Presets/`; `Source/` is for
+`About/`, `LoadFolders.xml`, `1.7/`, `Languages/` and `Presets/`; `Source/` is for
 developers and `BridgeTools/` is the separate optional companion below.
 Enable RimPLC through your mod manager. Back up a save before changing its mod
 list; removal from an existing save has not been checked.
@@ -35,7 +35,7 @@ dotnet build Source/RimPLC/RimPLC.csproj -c Release -p:RimWorldPath="C:/path/to/
 ```
 
 `RIMWORLD_PATH` is also accepted. The project targets .NET Framework 4.7.2 and
-C# 7.3, treats warnings as errors, and writes `1.6/Assemblies/RimPLC.dll`.
+C# 7.3, treats warnings as errors, and writes `1.7/Assemblies/RimPLC.dll`.
 Game assemblies are read from `RimWorldWin64_Data/Managed` with `Private=false`
 and are never copied into the output. Build commands do not stage or launch the
 game. The shipped `Presets/LadderV2.json` is self-contained; no parent repository,

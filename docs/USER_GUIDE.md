@@ -9,7 +9,7 @@ does not require Rimrooms, another mod or an expansion. It uses no Harmony.
 ## Game versions
 
 RimPLC is being prepared for **RimWorld 1.7 unstable / Waylith**, with **1.6 retained**. Both game
-versions load the same `1.6/` content folder. The inspected compiler and API baseline is 1.6;
+versions load the same `1.7/` content folder. The inspected compiler and API baseline is 1.6;
 **1.7 runtime compatibility has not been verified**.
 
 The [official announcement](https://store.steampowered.com/news/app/294100/view/672882362547178633)
@@ -68,7 +68,7 @@ restricted to the owner route.
 [RimPLC on GitHub](https://github.com/G-Fourteen/RimPLC) are the project repositories.
 Use its documented package or build instructions; the source checkout is not a finished Workshop
 installation. Place the loadable package in RimWorld's Local Mods folder with `About/` directly
-inside it. Leave the shared `1.6/` folder name unchanged.
+inside it. Leave the shared `1.7/` folder name unchanged.
 
 RimPLC and Rimrooms are independently enabled mods. A Rimrooms sensor link is separate
 integration work; installing both does not prove that link exists or that 1.7 compatibility has
