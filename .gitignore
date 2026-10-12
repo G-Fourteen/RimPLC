@@ -1,0 +1,11 @@
+# Build caches, symbols, IDE settings and local credentials never ship.
+**/bin/
+**/obj/
+.vs/
+*.pdb
+*.user
+*.suo
+.env
+.env.*
+*.pem
+*.key
