@@ -1,85 +1,54 @@
+# RimPLC user guide
+
+The user guide is the wiki at https://g-fourteen.github.io/RimPLC/ -- its source is under [docs/wiki](wiki/) and the rendered pages sit beside this file.
+
 # RimPLC
 
-![RimPLC — colony logic and control](https://raw.githubusercontent.com/G-Fourteen/RimPLC/main/About/Preview.png)
+**RimPLC is a standalone RimWorld mod that lays the colony's whole "if this, then this" logic
+out as a PLC ladder and scans it in game.** Sensors read the colony. Tags set thresholds. Marks
+hold what the game cannot measure. Rungs say what to do when their conditions hold, and the
+ladder window shows every one of them live: green when true, dark when false, amber when a
+reading is missing.
 
-**RimPLC is a separate mod for colony rules.** It reads the colony, evaluates your conditions and
-shows the matching advice in an in-game ladder window. Rimrooms does not require it, and RimPLC
-does not require Rimrooms, another mod or an expansion. It uses no Harmony.
+It needs no other mod, no expansion and no Harmony. Package id `Operator.RimPLC`.
+
+## Reading order
+
+| Page | What it answers |
+|---|---|
+| [Install](wiki/install.md) | Where the files go, game versions, the optional bridge companion |
+| [The window](wiki/window.md) | The Ladder, Tags, Marks, Sensors and Log tabs, and every button on them |
+| [The ladder](wiki/ladder.md) | What a rung is, how conditions, timers, counters, latches and priority work |
+| [Sensors](wiki/sensors.md) | The readings by group, warnings, and what "unmeasured" means |
+| [Commands and the AI API](wiki/commands.md) | The command file and the RimBridgeServer tools |
+| [Presets and building](wiki/presets.md) | The shipped ladder, export and import, building from source |
+| [Links](wiki/links.md) | Repositories, the Rimrooms wiki, licence |
+
+## What it does, in one scan
+
+1. Every scan (fast), every fourth (normal) or every sixteenth (slow) the sensors read the game:
+   clock, crew, health, hostiles, letters, stores, zones, buildings, designations, animals,
+   weapons, alerts, temperature, research, mood, wealth, damaged buildings. A reading the game
+   cannot give is **absent**, never a made-up zero.
+2. Every rung's `when` is evaluated against those readings, the tags and the marks. Comparisons,
+   OR, NOT, on/off delays, counters and one-shots are all instructions a rung can carry; their
+   memory moves on tick scans only and is saved with the colony.
+3. The live rungs are listed by priority. The first one is the colony's job right now; the
+   ladder window shows it and every other rung's state.
+4. On a rung's rising edge RimPLC posts its notice as a game message. Rungs switched to **auto**
+   may also set a mark, set a tag or post a message. **Nothing that changes the game world is
+   executed by RimPLC** -- it never drafts, builds, forbids or trades. Those steps are written
+   for an external assistant acting through another mod's automation file; without one, read
+   them as advice.
 
 ## Game versions
 
-RimPLC is being prepared for **RimWorld 1.7 unstable / Waylith**, with **1.6 retained**. Both game
-versions load the same `1.7/` content folder. The inspected compiler and API baseline is 1.6;
-**1.7 runtime compatibility has not been verified**.
+RimPLC declares RimWorld **1.6** and **1.7**, both loading the same `1.7/` content folder. The
+compiler and API baseline is 1.6 and the recorded play observations are from 1.6; a 1.7
+running-session result is still pending. A version declaration is not a compatibility result.
 
-The [official announcement](https://store.steampowered.com/news/app/294100/view/672882362547178633)
-explains the engine update and unstable branch. A version declaration does not replace an actual
-result on that version.
+## Where to start
 
-## What you can do
-
-| View | Purpose |
-|---|---|
-| **Ladder** | See which rules are true, false, unmeasured or unresolved; enable, edit or add a rule |
-| **Tags** | Set bounded thresholds used by rules |
-| **Marks** | Keep a named boolean or number for a judgement the game cannot measure |
-| **Sensors** | Inspect the values read from the colony |
-| **Log** | Review notices and recorded outputs |
-
-Sensors include health, mood, food, materials, threats, research, temperature, alerts and buildings.
-A missing value stays unmeasured; it does not become a guessed zero. Definitions are looked up by
-name, so a rule whose required mod or expansion is absent stays unavailable.
-
-Rules support comparisons, OR, NOT, timers, counters and one-shot conditions. Their memory is
-saved with the colony, and timers advance in game ticks.
-
-## Advice and automatic outputs
-
-**Advice is the default.** A matching rule can tell you what to do next. In the current
-implementation, automatic outputs are limited to **messages, marks and tags**.
-
-RimPLC does not currently carry out world-changing actions such as drafting pawns, placing
-blueprints, building a gate or changing work priorities. A plan describing those actions is not
-an implemented output. Keep the game's normal controls available.
-
-Many of the supplied preset's rules name a concrete next step -- arm the colony, put a cooler in
-the freezer wall, add a meal bill, pick the next research project, ask a faction for a trader.
-Those steps are written for an external assistant that can act through the Rimrooms mod's
-[automation file](https://g-fourteen.github.io/Rimrooms-AsyncIndustries/interface.html#automation-file-optional);
-without one, read them as advice. The
-Ladder view shows, for each rule, which steps a present client could carry out and which have no
-answer in the loaded mods.
-
-## Presets and saved rules
-
-The supplied ladder is a preset. Editing one of its rules creates a player override; reverting
-returns to the preset. Player rules, switches, marks, tag overrides and instruction memory are
-stored in the save.
-
-Export and import use the game's configuration folder under `RimPLC/exports/`. An import shows
-its changes before you apply it. Back up a colony before changing its rules or switching game
-versions; save and load behavior on 1.7 remains unverified.
-
-## Optional bridge access
-
-The core mod needs no bridge. Its optional companion exposes rule reads and edits through
-RimBridgeServer. The companion DLL belongs in the game's `BridgeTools/RimPLC/` folder, separate
-from the mod package, and requires a matching installed bridge SDK.
-
-Without that bridge, supported commands use `RimPLC/inbox.jsonl` and `outbox.jsonl` in the game's
-configuration folder. The in-game window remains available either way. Owner-only changes stay
-restricted to the owner route.
-
-## Getting it
-
-[RimPLC on Forgejo](https://git.unityailab.com/GFourteen/RimPLC) and
-[RimPLC on GitHub](https://github.com/G-Fourteen/RimPLC) are the project repositories.
-Use its documented package or build instructions; the source checkout is not a finished Workshop
-installation. Place the loadable package in RimWorld's Local Mods folder with `About/` directly
-inside it. Leave the shared `1.7/` folder name unchanged.
-
-RimPLC and Rimrooms are independently enabled mods. A Rimrooms sensor link is separate
-integration work; installing both does not prove that link exists or that 1.7 compatibility has
-passed.
-
-For Rimrooms installation, see [Install](https://g-fourteen.github.io/Rimrooms-AsyncIndustries/install.html). For the project addresses, see [Links](https://g-fourteen.github.io/Rimrooms-AsyncIndustries/links.html).
+Install it ([Install](wiki/install.md)), open the **RimPLC** tab on the bottom bar, and read the
+Ladder with **Live rungs only** ticked. The top rung is what the colony needs next. Switch a
+rung off if you disagree with it, edit it if you half agree, or write your own with **New rung**.

@@ -14,8 +14,10 @@ folder. A declaration is not a compatibility result: a running 1.7 session has
 not yet been verified. The core requires no other mod, Harmony or expansion.
 Rimrooms-specific preset rungs remain inactive without Rimrooms.
 
-Read the [user guide](docs/USER_GUIDE.md). JSON formats for rules, tags, sensors,
-marks, ladders and commands are included under [docs/schema](docs/schema/).
+Read the [wiki](https://g-fourteen.github.io/RimPLC/): install, the window, the ladder,
+sensors, commands and the AI API, presets and building. Its source is under
+[docs/wiki](docs/wiki/) and the rendered site under `docs/`. JSON formats for rules,
+tags, sensors, marks, ladders and commands are under [docs/schema](docs/schema/).
 
 ## Install
 
