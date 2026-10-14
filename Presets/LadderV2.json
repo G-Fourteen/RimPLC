@@ -2162,6 +2162,15 @@
    "warn": true,
    "note": "gates.py-side reading like threat_letter: computed from list_letters and ladder.json letters_seen, not by RimPLC's Sensors.cs"
   },
+  "colonists_trapped": {
+   "source": "RimPLC Sensors.cs: free colonists who cannot reach the map edge (reachability)",
+   "type": "int",
+   "group": "Crew",
+   "label": "Walled in",
+   "severity": "critical",
+   "tip": "A colonist cannot reach the map edge: walled in. game_set cmd free opens the way.",
+   "warn": ">0"
+  },
   "caravan_out": {
    "source": "RimPLC: Find.WorldObjects.Caravans, any IsPlayerControlled",
    "type": "bool",
@@ -8388,7 +8397,7 @@
     "game_pause_game pause true -- before any other order; pause is your friend",
     "read game_state once; close any operations menu (game_close_window) so pawn options show",
     "pawns selected but no pawn options/draft show: game_close_window, then select ONE pawn (click once) and read game_get_ui_layout",
-    "time stays stopped until the camp is LAID OUT (storage_room, shelter and stove ordered -> mark layout_set, confirmed on the mod's three oks) and the pawns are set; setup-6-run is the rung that starts time; orders placed while paused are queued and run then",
+    "time stays stopped until the camp is LAID OUT (storage_room and shelter ordered -> mark layout_set, confirmed on the mod's three oks) and the pawns are set; setup-6-run is the rung that starts time; orders placed while paused are queued and run then",
     "rock inside the pile's box being mined out for the layout (designations_mine > 0): time runs until it is gone -- the one exception besides a raid"
    ],
    "never": [
@@ -8696,17 +8705,20 @@
     "colony_exists": true,
     "mark_camp_set": true,
     "wood": "<{WOOD_RESERVE}",
-    "designations_cut": "<20"
+    "designations_cut": "<20",
+    "mark_chop_set": false
    },
    "then": [
     "game_set cmd chop count 300 (nearest trees to the camp anchor; trees on the site first -- storage_room marks the ones inside its box by itself); unpause so it is cut",
+    "the chop reply (\"n trees marked\" or \"already marked\") confirms mark chop_set: the rung is done then, whatever the designation count",
     "chop refused or 0 trees: game_set cmd explore for trees beyond reach, then game_get_cells_info on the wooded cells and game_apply_architect_designator Chop wood once",
-    "no trees on the whole map: reply_owner with the chop reply (the tile was picked wrong); never loop"
+    "no trees on the whole map: reply_owner with the chop reply (the tile was picked wrong); never loop",
+    "the reply read: ladder_set mark chop_set true (confirmed on the chop ok)"
    ],
    "never": [
     "put everyone on PlantCutting"
    ],
-   "why": "owner: \"and a big issue its it never auto unforbid all the starting materials and never copped wood to build starting structures rooms\" / owner: \"set your priorities, dont need everyone choopping wood, multitask\" -- walkthrough: walkthrough-opening-and-camp.md 'Chop trees on the site first, then chop more for wood stock.' [start] B,Q / owner: \"there is no wood no trees on this map, thats why in advanced setting on world gen setup you set 300x300 mapo and spring, and then when choosing a map tile u pic on that has mountains(the rock areas on map) in forest area and jungle areas the light green and green, terrain tab on left tells u all this when u highlight via select the tiles\"",
+   "why": "run 5 (2026-10-14 01:09-01:11): 330 wood marked on 8 trees, designations_cut 8 < 20, the rung stayed on top and she chopped the same trees every turn / owner: \"and a big issue its it never auto unforbid all the starting materials and never copped wood to build starting structures rooms\" / owner: \"set your priorities, dont need everyone choopping wood, multitask\" -- walkthrough: walkthrough-opening-and-camp.md 'Chop trees on the site first, then chop more for wood stock.' [start] B,Q / owner: \"there is no wood no trees on this map, thats why in advanced setting on world gen setup you set 300x300 mapo and spring, and then when choosing a map tile u pic on that has mountains(the rock areas on map) in forest area and jungle areas the light green and green, terrain tab on left tells u all this when u highlight via select the tiles\"",
    "source": "book",
    "mode": "advise"
   },
@@ -8830,7 +8842,8 @@
     "refused for solid rock or a wall inside the pile's box: game_set cmd camp x z one pile-width toward open ground, then storage_room again",
     "refused otherwise: ladder_set mark storage_room_tried true, then ladder_set mark storage_room_tried false (each refusal counts once; 2 -> setup-4a-storage-room-fallback)",
     "the reply says planned: unpause so it is built, Construction stays on for everyone, chop if the wood needed is above wood; then ladder_set mark storage_room_set true (the mod's ok: confirms it) (the shelter rung follows while the walls go up)",
-    "say on stream in one line: the supplies are being roofed where they fell"
+    "say on stream in one line: the supplies are being roofed where they fell",
+    "the reply names the doors and their lanes (two doors, different sides; the flank walls wait for the doors): read it, never wall a lane; game_set cmd camp_plan reads the open front and the mountain back"
    ],
    "never": [
     "haul the pile somewhere else first",
@@ -8890,7 +8903,9 @@
     "fridge (roofed food store), workshop (crafting spot / butcher), 1x2 table + stool, torch lamp, a campfire in the middle -- all inside or touching the camp (game_set cmd build def Campfire x z, game_set cmd build def TorchLamp x z)",
     "store everything under a roof except steel and stone blocks",
     "water/marsh inside the camp perimeter -> game_set cmd terraform mode bridge x z w h before building on it (Core has no mud/water-to-soil; mud: move the build or floor it)",
-    "unpause to build; when beds >= colonists and store_roofed_fraction >= 0.75: ladder_set mark shelter_set true"
+    "unpause to build; when beds >= colonists and store_roofed_fraction >= 0.75: ladder_set mark shelter_set true",
+    "the shelter ok with the storage room already ok: ladder_set mark layout_set true (confirmed on both replies) -- the camp is laid out, setup-6-run starts time",
+    "the reply names the doors and their lanes (two doors, different sides; the flank walls wait for the doors): read it, never wall a lane; game_set cmd camp_plan reads the open front and the mountain back"
    ],
    "never": [
     "build in steel",
@@ -8911,21 +8926,21 @@
    "latch": false,
    "when": {
     "colony_exists": true,
-    "mark_storage_room_set": true,
-    "mark_shelter_set": true,
+    "mark_layout_set": true,
+    "store_roofed_fraction": ">0",
     "mark_stove_set": false
    },
    "then": [
-    "game_set cmd stove -- a fueled stove on a wall of the roofed room nearest the food store, never in the doorway (a PLANNED room is fine: the stove is planned with it)",
-    "'kitchen room was planned' / 'walls are still planned': that is the plan standing, not a refusal -- the camp is now laid out: ladder_set mark layout_set true (confirmed on the storage_room, shelter and stove oks)",
-    "after setup-6-run, when stoves >= 1: game_set cmd kitchen (simple meals until {MEAL_BILL_TARGET}, Do until you have X, never Do forever)",
+    "game_set cmd stove -- a fueled stove on a wall of the roofed room nearest the food store, never in the doorway (a room must STAND: the command refuses while walls are planned)",
+    "'no finished roofed room yet': wait for the walls (time runs after setup-6-run); do not call stove again until a roofed room stands",
+    "when stoves >= 1: game_set cmd kitchen (simple meals until {MEAL_BILL_TARGET}, Do until you have X, never Do forever)",
     "stoves >= 1 and the bill is placed: ladder_set mark stove_set true"
    ],
    "never": [
     "place a second stove",
     "a Do-forever bill"
    ],
-   "why": "owner 2026-10-13 (run 5): \"wtf!!!1 she is just letting the game run does she not know to never let the game run just blindly pause is her friend should should not unpause until inistal setup and zoneing is done and buildings are layed out\" / \"one day just fast forwards to day two and she hasnt done a fucking thing this run throuhg is wasted restart it all\" / \"she should have beend buildt by the end of day one\" / owner 2026-10-13: \"and wtf she never built a kitchen and is running around killing animals she cat butcher because she never built a camp\" / owner: \"the whole logic gate chain like a plc i told you to have it use and edit on the fly\" / owner: \"and set amounts higher and higher as your base grows\" -- walkthrough: walkthrough-opening-and-camp.md stove bill simple meals, do until ~6-20 [survival] B,Q",
+   "why": "run 5 (2026-10-14 01:21): stove refused until a room stands while the layout gate waited on the stove's ok -- a deadlock; the layout is the two rooms laid out / owner 2026-10-13 (run 5): \"wtf!!!1 she is just letting the game run does she not know to never let the game run just blindly pause is her friend should should not unpause until inistal setup and zoneing is done and buildings are layed out\" / \"one day just fast forwards to day two and she hasnt done a fucking thing this run throuhg is wasted restart it all\" / \"she should have beend buildt by the end of day one\" / owner 2026-10-13: \"and wtf she never built a kitchen and is running around killing animals she cat butcher because she never built a camp\" / owner: \"the whole logic gate chain like a plc i told you to have it use and edit on the fly\" / owner: \"and set amounts higher and higher as your base grows\" -- walkthrough: walkthrough-opening-and-camp.md stove bill simple meals, do until ~6-20 [survival] B,Q",
    "source": "book",
    "mode": "advise"
   },
@@ -12104,6 +12119,28 @@
    "mode": "advise"
   },
   {
+   "id": "colonist-trapped",
+   "priority": 0.91,
+   "family": "survival",
+   "latch": false,
+   "when": {
+    "colony_exists": true,
+    "colonists_trapped": ">0"
+   },
+   "then": [
+    "game_set cmd free -- a plan on the room's edge is cancelled or a wall marked to deconstruct so they can get out; read who and where",
+    "game_pause_game pause false if time is stopped: the way out is built with time running (Construction on)",
+    "say it on stream: who was walled in and that the way out is coming; then game_set cmd camp_plan and plan the door again with its lane clear"
+   ],
+   "never": [
+    "run time at Superfast while someone is walled in",
+    "plan another wall before the way out stands"
+   ],
+   "why": "owner 2026-10-14: \"she only buildt one door on the main rooms and now she is blocked ina nd gonna dy\" / \"why the fuck is she blocvking both sides of doors with walls\" -- the planner (CampPlan.cs) gives rooms two doors with clear lanes; this rung is the safety valve",
+   "source": "book",
+   "mode": "advise"
+  },
+  {
    "id": "unarmed-pawn",
    "priority": 2.6,
    "family": "war",
@@ -12137,7 +12174,7 @@
     "mark_layout_set": false
    },
    "then": [
-    "the camp is LATE: the owner's standard is a camp built by the end of day one -- game_pause_game pause true, then lay it out now in order: game_set cmd camp, stockpile_camp, storage_room, shelter, stove",
+    "the camp is LATE: the owner's standard is a camp built by the end of day one -- game_pause_game pause true, then lay it out now in order: game_set cmd camp, stockpile_camp, storage_room, shelter",
     "reply_owner one line: what stands, what is planned, what is missing -- no excuses",
     "say it on stream plainly: the camp is late and this is the plan"
    ],
@@ -13055,7 +13092,8 @@
    "shipfuel_short_set",
    "junk_weapons_set",
    "<rung_id>_done (latches)",
-   "layout_set"
+   "layout_set",
+   "chop_set"
   ]
  }
 }
